@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Password Validation Form</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      /* Custom styles for password strength feedback */
+      .feedback {
+        font-weight: bold;
+      }
+
+      .weak {
+        color: red;
+      }
+
+      .medium {
+        color: orange;
+      }
+
+      .strong {
+        color: green;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container mt-5">
+      <h2>Password Validation Form</h2>
+      <form>
+        <div class="form-group">
+          <label for="password"
+            >Password
+            <span
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character."
+              >🛈</span
+            ></label
+          >
+          <div class="input-group">
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              placeholder="Enter your password"
+            />
+            <div class="input-group-append">
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                id="togglePassword"
+              >
+                Show
+              </button>
+            </div>
+          </div>
+          <small id="passwordHelp" class="form-text text-muted"
+            >Password must be at least 8 characters long, include an uppercase
+            letter, a lowercase letter, a number, and a special
+            character.</small
+          >
+          <div id="passwordFeedback" class="feedback mt-2"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input
+            type="password"
+            class="form-control"
+            id="confirmPassword"
+            placeholder="Re-enter your password"
+          />
+          <div id="confirmFeedback" class="feedback mt-2"></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
+          Submit
+        </button>
+      </form>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Custom JavaScript for password validation -->
+    <script>
+      $(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+      });
+
+      const passwordInput = document.getElementById("password");
+      const confirmPasswordInput = document.getElementById("confirmPassword");
+      const feedback = document.getElementById("passwordFeedback");
+      const confirmFeedback = document.getElementById("confirmFeedback");
+      const submitBtn = document.getElementById("submitBtn");
+      const togglePasswordBtn = document.getElementById("togglePassword");
+
+      passwordInput.addEventListener("input", validatePassword);
+      confirmPasswordInput.addEventListener("input", checkPasswordMatch);
+      togglePasswordBtn.addEventListener("click", togglePasswordVisibility);
+
+      function validatePassword() {
+        const password = passwordInput.value;
+        const minLength = 8;
+        const regexUpper = /[A-Z]/;
+        const regexLower = /[a-z]/;
+        const regexNumber = /[0-9]/;
+        const regexSpecial = /[!@#$%^&*(),.?":{}|<>]/;
+
+        let strength = 0;
+
+        if (password.length >= minLength) strength++;
+        if (regexUpper.test(password)) strength++;
+        if (regexLower.test(password)) strength++;
+        if (regexNumber.test(password)) strength++;
+        if (regexSpecial.test(password)) strength++;
+
+        // Update feedback based on password strength
+        if (strength === 0) {
+          feedback.textContent = "";
+        } else if (strength < 3) {
+          feedback.textContent = "Weak password";
+          feedback.className = "feedback weak";
+        } else if (strength === 3 || strength === 4) {
+          feedback.textContent = "Medium strength password";
+          feedback.className = "feedback medium";
+        } else if (strength === 5) {
+          feedback.textContent = "Strong password";
+          feedback.className = "feedback strong";
+        }
+
+        checkPasswordMatch();
+      }
+
+      function checkPasswordMatch() {
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+
+        if (password !== confirmPassword) {
+          confirmFeedback.textContent = "Passwords do not match";
+          confirmFeedback.className = "feedback weak";
+          submitBtn.disabled = true;
+        } else {
+          confirmFeedback.textContent = "Passwords match";
+          confirmFeedback.className = "feedback strong";
+          submitBtn.disabled =
+            passwordInput.value === "" ||
+            feedback.className === "feedback weak";
+        }
+      }
+
+      function togglePasswordVisibility() {
+        const type = passwordInput.type === "password" ? "text" : "password";
+        passwordInput.type = type;
+        confirmPasswordInput.type = type;
+        togglePasswordBtn.textContent = type === "password" ? "Show" : "Hide";
+      }
+    </script>
+  </body>
+</html>
